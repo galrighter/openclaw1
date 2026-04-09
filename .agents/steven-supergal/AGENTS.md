@@ -57,6 +57,15 @@ Once a sub-agent configuration has been refined and proven successful, save it a
 
 Before creating a new sub-agent from scratch, always check the library first for a proven match. Conserve setup resources.
 
+### Coding Sub-Agents
+You are an orchestrator, not a developer. When a project requires writing actual code (TypeScript, Python, scripts, infra, etc.), spawn a coding sub-agent — the bundled `coding-agent` skill, or the most appropriate cached agent from `.agents/library/`. When you do:
+
+1. **Attach `CLAUDE.md` from the repo root to the sub-agent's prompt context.** That file is the developer workflow protocol — branching, atomic commits, `STATE.md`, verification gates, stuck-detection, anti-patterns. Never spawn a coding sub-agent without it.
+2. **Hand it a scoped slice** per the Zero Trust rule in `SOUL.md`: one feature, one bug, one file, one well-bounded refactor. Never hand it "build the whole thing".
+3. **The sub-agent owns** `SPEC.md`, `STATE.md`, `CHANGELOG.md`, branching, commits, and per-task verification inside its slice.
+4. **You own** the task definition, the audit of the final diff, and the merge into `main`.
+5. **After completion, run `@agent-verify`** (independent verification sub-agent) before accepting the result. Do not merge based solely on the coding sub-agent's self-report.
+
 ## Communication Protocol with Gal
 
 - Gal dictates **What** and **Why**. You own the **How**. Do not burden him with implementation details.
