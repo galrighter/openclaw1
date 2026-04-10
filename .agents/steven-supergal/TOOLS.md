@@ -43,6 +43,33 @@ When choosing a vendor, platform, service, or tool for any task, apply these cri
 
 When two options are otherwise equivalent, prefer the one that scores higher on these criteria. Document the trade-off in the Status Document when you make a non-obvious choice.
 
+## Capability Discovery
+
+Before assuming a capability exists or does not exist, **verify it at runtime**. Do not hallucinate tool names or invent skills that may not be installed.
+
+### How to Discover What You Have
+
+1. **Bundled skills** — list the `skills/` directory in the workspace and `~/.openclaw/workspace/skills/`. As of the last audit, there are ~53 bundled skills including: `clawhub`, `mcporter`, `1password`, `model-usage`, `coding-agent`, `notion`, `github`, `taskflow`, `himalaya` (email), `summarize`.
+2. **ClawHub registry** — use the `clawhub` skill to search the remote skill registry for capabilities not bundled locally.
+3. **MCP servers** — use the `mcporter` skill to discover, install, and bridge MCP servers. This is how you access capabilities outside the OpenClaw ecosystem (e.g., Playwright for browser automation, Chrome DevTools, database connectors).
+4. **Installed plugins** — query the OpenClaw gateway for active plugins and their exposed capabilities.
+5. **Active sessions** — use `sessions_list` to see what sub-agents are already running.
+
+### What Does NOT Exist Natively
+
+- **Browser automation** — there is no built-in `browser` tool. For browser tasks, bridge a Playwright MCP server or Chrome DevTools MCP server via `mcporter`.
+- **Cron / native scheduling** — there is no built-in `cron` or `schedule` tool. Use the `taskflow` skill for task orchestration, or delegate to an external scheduler via MCP.
+- **Direct OS process management** — there is no built-in `process` or `bash` tool. Execution happens through skills, plugins, MCP servers, and sub-agents.
+
+### Discovery Before Every Project
+
+At the start of any new project, run a capability audit:
+1. List available skills, plugins, and MCP servers.
+2. Map them to the project's requirements.
+3. Identify gaps — capabilities needed but not available.
+4. For each gap: search ClawHub → search MCP registries via `mcporter` → consider custom code (last resort per the Tool Selection Hierarchy).
+5. Log the capability map in the Status Document.
+
 ## Sub-Agent Orchestration (`sessions_*`)
 
 You delegate work through OpenClaw's built-in session tools. These are the only sanctioned way to spawn and coordinate sub-agents. Do not shell out to subprocess managers.
@@ -72,33 +99,6 @@ Before calling `sessions_spawn`, confirm:
 - Audit the transcript.
 - Refine the prompt/skill if weaknesses are found.
 - If the refined agent is successful, cache it to `.agents/library/<agent-name>/`.
-
-## Capability Discovery
-
-Before assuming a capability exists or does not exist, **verify it at runtime**. Do not hallucinate tool names or invent skills that may not be installed.
-
-### How to Discover What You Have
-
-1. **Bundled skills** — list the `skills/` directory in the workspace and `~/.openclaw/workspace/skills/`. As of the last audit, there are ~53 bundled skills including: `clawhub`, `mcporter`, `1password`, `model-usage`, `coding-agent`, `notion`, `github`, `taskflow`, `himalaya` (email), `summarize`.
-2. **ClawHub registry** — use the `clawhub` skill to search the remote skill registry for capabilities not bundled locally.
-3. **MCP servers** — use the `mcporter` skill to discover, install, and bridge MCP servers. This is how you access capabilities outside the OpenClaw ecosystem (e.g., Playwright for browser automation, Chrome DevTools, database connectors).
-4. **Installed plugins** — query the OpenClaw gateway for active plugins and their exposed capabilities.
-5. **Active sessions** — use `sessions_list` to see what sub-agents are already running.
-
-### What Does NOT Exist Natively
-
-- **Browser automation** — there is no built-in `browser` tool. For browser tasks, bridge a Playwright MCP server or Chrome DevTools MCP server via `mcporter`.
-- **Cron / native scheduling** — there is no built-in `cron` or `schedule` tool. Use the `taskflow` skill for task orchestration, or delegate to an external scheduler via MCP.
-- **Direct OS process management** — there is no built-in `process` or `bash` tool. Execution happens through skills, plugins, MCP servers, and sub-agents.
-
-### Discovery Before Every Project
-
-At the start of any new project, run a capability audit:
-1. List available skills, plugins, and MCP servers.
-2. Map them to the project's requirements.
-3. Identify gaps — capabilities needed but not available.
-4. For each gap: search ClawHub → search MCP registries via `mcporter` → consider custom code (last resort per the Tool Selection Hierarchy).
-5. Log the capability map in the Status Document.
 
 ## LLM Routing & Cost Control
 
