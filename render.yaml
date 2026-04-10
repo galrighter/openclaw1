@@ -3,7 +3,7 @@ services:
     name: openclaw
     runtime: docker
     plan: standard
-    dockerCommand: node -e "const fs=require('fs'),d=process.env.OPENCLAW_STATE_DIR||'/data/.openclaw';fs.mkdirSync(d,{recursive:true});const f=d+'/openclaw.json';let c={};try{c=JSON.parse(fs.readFileSync(f,'utf8'))}catch{};c.gateway={...c.gateway,controlUi:{...c.gateway?.controlUi,dangerouslyAllowHostHeaderOriginFallback:true}};fs.writeFileSync(f,JSON.stringify(c,null,2));require('child_process').execFileSync('node',['openclaw.mjs','gateway','--allow-unconfigured','--bind','lan'],{stdio:'inherit'})"
+    dockerCommand: node scripts/render-start.mjs
     healthCheckPath: /health
     envVars:
       - key: OPENCLAW_GATEWAY_PORT
