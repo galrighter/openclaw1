@@ -89,6 +89,7 @@ docs/internal/
 tmp/
 IDENTITY.md
 USER.md
+!.agents/steven-supergal/USER.md
 .tgz
 .idea
 
