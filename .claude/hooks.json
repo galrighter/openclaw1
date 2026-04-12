@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "FileChanged": [
+      {
+        "matcher": "toolmarket/PROMPT.md",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat toolmarket/PROMPT.md >> toolmarket/RESPONSE.md && echo '\n---\n' >> toolmarket/RESPONSE.md"
+          }
+        ]
+      }
+    ]
+  }
+}
