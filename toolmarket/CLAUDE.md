@@ -1,53 +1,48 @@
 # CLAUDE.md — TOOLMARKET Tasks Engine
 
-> Developer workflow for this build. Read this first, then SPEC.md, then STATE.md.
+Read this, then SPEC.md, then STATE.md. Build without asking questions.
+Write questions to STATE.md under "Questions" section.
 
 ## Role
-You are building the TOOLMARKET Tasks Engine — a system that lets AI agents earn CU (compute units) by completing tasks, instead of paying money.
+Build the TOOLMARKET Tasks Engine code in THIS repo (galrighter/openclaw1).
+All output goes in the toolmarket/ folder of this repo.
+You do NOT need access to any other repo. I will handle deployment.
 
-## Working Rules
-1. **Read before write.** Understand existing code before changing anything.
-2. **Small steps, verify each.** Build one thing, test it, commit, move on.
-3. **One commit per logical unit.** Keep repo buildable after every commit.
-4. **3 failures = change approach.** Don't retry the same thing 3 times.
-5. **Update STATE.md** after every meaningful change.
+## What to deliver
+Two files in toolmarket/:
+1. tasks.js — all task route handlers as exported functions
+2. migrate_tasks.js — Supabase DB migration script
 
-## Language
-- Code, comments, commits: English
-- If you need to ask a question: write it to STATE.md under "Questions" — do not stop working
+## Supabase Connection (for migrate_tasks.js)
+POST https://api.supabase.com/v1/projects/vjpkamywhehslzdhedwu/database/query
+Header: Authorization: Bearer [value of TOOLMARKET_SUPABASE_MGMT_TOKEN env var]
+Body JSON: { "query": "your SQL here" }
 
-## Stack
-- Node.js (no external dependencies — pure https/http only)
-- Supabase (via REST API, not SDK)
-- All env vars via process.env
+The migration script should use the https module to call this endpoint.
+The token value comes from process.env.TOOLMARKET_SUPABASE_MGMT_TOKEN.
 
-## Environment Variables (set on Render for toolmarket-api service)
-- TOOLMARKET_SUPABASE_URL
-- TOOLMARKET_SUPABASE_SERVICE_KEY
-- TOOLMARKET_SUPABASE_MGMT_TOKEN
-- TOOLMARKET_BASE_URL = https://toolmarket-api.onrender.com
+## Existing API Patterns (for tasks.js)
+The existing server uses these patterns — match them exactly:
 
-## Target Repository
-- GitHub: stivensupgal/toolmarket-api
-- Auto-deploys to Render on push to main
-- Test after deploy: curl https://toolmarket-api.onrender.com/health
+Route registration:
+route('GET', '/tasks', handler)
+route('POST', '/tasks|||:id|||claim', handler)  — note: uses ||| not /
 
-## Existing Code Patterns (study server.js before adding routes)
-- Route: route('METHOD', '/path', async (req, res, body, agent, urlObj, params) => {...})
-- Auth: if (!agent) return send(res, 401, { error: 'Invalid or missing X-API-Key' })
-- DB: await db('GET'/'POST'/'PATCH', 'table_name', body, '?query=...')
-- Router key separator is ||| (not :) — important
-- send(res, statusCode, object) for all responses
+DB calls:
+await db('GET', 'table_name', null, '?column=eq.value&select=*')
+await db('POST', 'table_name', bodyObject)
+await db('PATCH', 'table_name', bodyObject, '?id=eq.uuid')
 
-## Supabase DDL (how to run schema changes)
-POST to https://api.supabase.com/v1/projects/vjpkamywhehslzdhedwu/database/query
-Auth: Bearer process.env.TOOLMARKET_SUPABASE_MGMT_TOKEN
-Body: { "query": "CREATE TABLE..." }
+Response:
+send(res, 200, { key: value })
+send(res, 201, { key: value })
+send(res, 404, { error: 'Not found' })
 
-## Definition of Done
-For each task in SPEC.md:
-1. Schema migrated in Supabase
-2. Routes working (tested with curl)
-3. Committed to stivensupgal/toolmarket-api
-4. Deployed and verified on Render
-5. STATE.md updated
+Auth check:
+if (!agent) return send(res, 401, { error: 'Invalid or missing X-API-Key' })
+
+## Rules
+1. Read before write
+2. Small steps — build one function, test logic, move on
+3. 3 failures on same thing = completely different approach
+4. Update STATE.md after every file you create or modify
