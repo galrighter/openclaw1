@@ -61,3 +61,44 @@ lesson: A PR status of total_count=0 / "pending" means no checks are configured
         mistake an empty check set for CI that needs babysitting.
 when:   Checking CI on PR #1 after removing all .github/workflows.
 source: branch claude/openclaw-hetzner-cleanup-0ncy65 / PR #1
+
+[2026-06-15] [✗] [content]
+lesson: A Codex "subscription usage limit" is account/subscription-scoped, NOT
+        per-model. A same-account model fallback (openai/gpt-5.5 → openai/gpt-5.4)
+        does not escape it — both failed identically ("All models failed (2)").
+        Real resilience needs a fallback to a different provider/account.
+when:   Diagnosing why אפי stopped replying on WhatsApp; gpt-5.4 fallback failed too.
+source: branch claude/efi-deployment-notes (אפי Hetzner incident)
+
+[2026-06-15] [✓] [convention]
+lesson: OpenClaw model fallback is configured at agents.defaults.model.fallbacks
+        (an ordered array on the singular `model` object), NOT by adding keys to
+        agents.defaults.models — that plural map is only the model catalog and
+        adding to it yields fallback decision next=none.
+when:   First fallback edit didn't take; verified the real key in
+        src/config/schema.base.generated.ts.
+source: branch claude/efi-deployment-notes
+
+[2026-06-15] [✓] [process]
+lesson: "typing… but no reply" on a chat channel = channel connected + message
+        received, but model generation failed. Diagnose at the model/auth layer
+        (FailoverError / usage limit in gateway logs), not the connection layer.
+when:   אפי showed WhatsApp typing indicator with no answer.
+source: branch claude/efi-deployment-notes
+
+[2026-06-15] [✓] [process]
+lesson: Operator ground truth beats a log-anchored hypothesis. I over-anchored on
+        the rate-limit log line; Gal's real-world signals (ChatGPT showed no limit;
+        live WhatsApp linking requests) correctly forced a re-examination. Both held
+        partial truth — rate limit was root cause, but subscription-wide. When the
+        operator pushes back, re-check before defending.
+when:   Gal challenged the rate-limit diagnosis mid-investigation.
+source: branch claude/efi-deployment-notes
+
+[2026-06-15] [✓] [process]
+lesson: The agent sandbox cannot reach אפי's Hetzner server (port 22 firewalled +
+        no SSH key), and that is the correct security posture. Drive it via a
+        copy-paste runbook with a human at the shell; batch commands to cut
+        round-trips, and never print secret-bearing lines (grep -ivE 'key|token|secret').
+when:   Gal asked why I still needed copy-paste / to "take full access".
+source: branch claude/efi-deployment-notes
