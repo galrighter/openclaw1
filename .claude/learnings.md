@@ -38,3 +38,26 @@ lesson: Branch names contain '/', which is illegal in a flat marker filename.
 when:   Implementing reflect-before-merge.py for a branch named
         claude/openclaw-hetzner-cleanup-0ncy65.
 source: branch claude/openclaw-hetzner-cleanup-0ncy65
+
+[2026-06-15] [✓] [convention]
+lesson: The reflect-before-merge GUIDE assumes Claude Code's settings.json
+        PreToolUse hooks, but this repo carried an OpenClaw-runtime hooks.json
+        (FileChanged). Wire the gate to the harness that actually performs the
+        merge — not whichever hook file happens to already exist.
+when:   Choosing where to install the gate during repo repurposing.
+source: branch claude/openclaw-hetzner-cleanup-0ncy65 / PR #1
+
+[2026-06-15] [✗] [edge-case]
+lesson: A PreToolUse hook added mid-session may not fire until the next session,
+        because hooks load at session start. On the bootstrapping merge (the PR
+        that installs the gate), follow the reflect→record→marker→merge contract
+        manually rather than trusting the freshly-installed hook to block.
+when:   Merging PR #1, which itself installs the gate.
+source: branch claude/openclaw-hetzner-cleanup-0ncy65 / PR #1
+
+[2026-06-15] [✓] [content]
+lesson: A PR status of total_count=0 / "pending" means no checks are configured
+        (all workflows were deleted), not a stuck or failing pipeline. Don't
+        mistake an empty check set for CI that needs babysitting.
+when:   Checking CI on PR #1 after removing all .github/workflows.
+source: branch claude/openclaw-hetzner-cleanup-0ncy65 / PR #1
