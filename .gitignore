@@ -1,0 +1,7 @@
+# Per-session reflection markers — local only, never committed.
+.claude/state/
+
+# OS / editor noise
+.DS_Store
+*.swp
+*~
